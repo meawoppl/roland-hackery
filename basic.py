@@ -1,4 +1,33 @@
+import cups
+import tempfile
 import subprocess
+
+
+
+class RolandMill:
+    def __init__(self):
+        self.conn = cups.Connection()
+
+        print('Searching for a roland mill')
+        for pKey, pVal in self.conn.getPrinters().items():
+            if (pKey.startswith('Roland')):
+                print("Found: " + pKey)
+                self.name = pKey
+                self.prop = pVal
+                return
+        raise RuntimeError('No Roland Devices Found in '.format(self.conn.getPrinters().keys()) )
+
+    def printText(self, text: str):
+        with tempfile.tempfile() as path:
+            with open(path, 'w') as f:
+                f.write(text)
+            return self.printFile(path)
+
+    def printFile(self, filename: str):
+        pass
+
+
+RolandMill()
 
 
 def fmt(n: float) -> str:
@@ -34,18 +63,21 @@ class RMDCommander:
 
 
 
-cmd = RMDCommander()
 
-d = 500
 
-for v in range(2, 5):
-    cmd.speed(v)
-    cmd.rel(d, 0, 0)
-    cmd.rel(-d, 0, 0)
-    cmd.rel(0, +d, 0)
-    cmd.rel(0, -d, 0)
-    cmd.rel(0, 0, +d)
-    cmd.rel(0, 0, -d)
+def basic_run():
+    cmd = RMDCommander()
 
-cmd.emit()
-cmd.run()
+    d = 500
+
+    for v in range(2, 5):
+        cmd.speed(v)
+        cmd.rel(d, 0, 0)
+        cmd.rel(-d, 0, 0)
+        cmd.rel(0, +d, 0)
+        cmd.rel(0, -d, 0)
+        cmd.rel(0, 0, +d)
+        cmd.rel(0, 0, -d)
+
+    cmd.emit()
+    cmd.run()
